@@ -1,27 +1,36 @@
-let web3;
 let userAddress;
 
-// Connect to the wallet
-document.getElementById("connect").addEventListener("click", async () => {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-        userAddress = accounts[0];
-        alert(`Wallet connected: ${userAddress}`);
-        loadNFTs();
-    } else {
-        alert("Please install MetaMask!");
+// Set the wallet address
+document.getElementById("set-wallet").addEventListener("click", () => {
+    const walletInput = document.getElementById("wallet").value.trim();
+    if (walletInput === "") {
+        alert("Please enter a valid wallet address!");
+        return;
     }
+    userAddress = walletInput;
+    alert(`Wallet set: ${userAddress}`);
+    loadNFTs();
+    updateUI();
 });
+
+// Update the UI based on wallet presence
+function updateUI() {
+    const mintButton = document.getElementById("mint");
+    if (userAddress) {
+        mintButton.disabled = false;
+    } else {
+        mintButton.disabled = true;
+    }
+}
 
 // Simulate NFT minting
 document.getElementById("mint").addEventListener("click", () => {
     if (!userAddress) {
-        alert("Please connect your wallet first!");
+        alert("Please set a wallet address first!");
         return;
     }
 
-    // Create a fake NFT
+    // Create a simulated NFT
     const nftId = Date.now();
     const nft = {
         id: nftId,
@@ -29,7 +38,7 @@ document.getElementById("mint").addEventListener("click", () => {
         owner: userAddress,
     };
 
-    // Store NFT in local storage
+    // Store the NFT in local storage
     const nfts = JSON.parse(localStorage.getItem("nfts") || "[]");
     nfts.push(nft);
     localStorage.setItem("nfts", JSON.stringify(nfts));
@@ -38,7 +47,7 @@ document.getElementById("mint").addEventListener("click", () => {
     loadNFTs();
 });
 
-// Load NFTs owned by the connected user
+// Load NFTs owned by the user
 function loadNFTs() {
     if (!userAddress) return;
 
